@@ -1,16 +1,17 @@
+// declaring these two functions to use them in console. 
 function componentToHex(c) {
   var hex = c.toString(16);
   return hex.length == 1 ? "0" + hex : hex;
 }
 
 function rgbToHex(r, g, b) {
-  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-require(["bspline"], function (BSpline) {
+require(['bspline'], function (BSpline) {
   'use strict'
 
-  var s = Snap("#svg");
+  var s = Snap('#svg');
 
   var colors = {
     gray1: '#0f0f0f',
@@ -19,25 +20,25 @@ require(["bspline"], function (BSpline) {
   };
 
   // declare svg elements
-  var background;
-  var onTop;
-
-  background = s.rect(0, 0, window.innerWidth, window.innerHeight);
+  var background = s.rect(0, 0, window.innerWidth, window.innerHeight);
   background.attr({
     fill: colors.gray1,
   });
 
-  onTop = s.rect(100, 100, window.innerWidth - 200, window.innerHeight - 200);
+  var onTop = s.rect(100, 100, window.innerWidth - 200, window.innerHeight - 200);
   onTop.attr({
     fill: colors.gray2,
   });
 
-  // set the position of all the svg elements
-  // call this function in future to reset
-  function defineElements() {
-    
-  }
-  defineElements();
+  var fpsText = s.text(10, 10, "test");
+  fpsText.attr({
+    fill: "white",
+  });
+
+  var fpsText2 = s.text(10, 20, "test");
+  fpsText2.attr({
+    fill: "white",
+  });
 
   var bspline = new BSpline();
   bspline.appendPoint(100, 100);
@@ -59,51 +60,30 @@ require(["bspline"], function (BSpline) {
     strokeLinecap: 'round',
     fillOpacity: 0,
   });
+  console.log(bsplinePath);
 
-  // var circle_1 = s.circle(300, 200, 140);
-  // var circle_2 = s.circle(250, 200, 140);
+  var v = bspline.calc(performance.now() / 1000);
+  var bsplineDot = s.circle(v.x, v.y, 5);
+  bsplineDot.attr({
+    fill: 'red'
+  });
 
-  // // Group circles together
+  function updateSVG() {
+    // modify svg by changing attributes
+    var v = bspline.calc(performance.now() / 1000);
+    bsplineDot.attr({
+      cx: v.x,
+      cy: v.y,
+    });
 
-  // var circles = s.group(circle_1, circle_2);
+    fpsText.attr({
+      text: 'fps: ' + fpsCounter.avgfps,
+    });
 
-  // var ellipse = s.ellipse(275, 220, 170, 90);
-
-  // // Add fill color and opacity to circle and apply
-  // // the mask
-  // circles.attr({
-  //   fill: 'coral',
-  //   fillOpacity: .6,
-  //   mask: ellipse
-  // });
-
-  // ellipse.attr({
-  //   fill: '#fff',
-  //   opacity: .8
-  // });
-
-  // // Create a blink effect by modifying the rx value
-  // // for ellipse from 90px to 1px and backwards
-
-  // function blink() {
-  //   ellipse.animate({ ry: 1 }, 220, function () {
-  //     ellipse.animate({ ry: 90 }, 300);
-  //   });
-  // };
-
-  // set mouse event listener and handler
-  // var svg = document.getElementById('svg');
-  // svg.addEventListener("mousedown", function () {
-
-  // });
-
-  // svg.addEventListener("mouseup", function () {
-
-  // });
-
-  // svg.addEventListener("mousemove", function () {
-
-  // });
+    fpsText2.attr({
+      text: 'fps: ' + fpsCounter.rawfps,
+    });
+  }
 
   // make canvas resize when browser window is resized
   window.addEventListener('resize', resizeCanvas, false);
@@ -119,12 +99,41 @@ require(["bspline"], function (BSpline) {
     });
   }
 
-  // setInterval(blink, 3000);
+  // declare an FPSCounter object
+  function FPSCounter() {
+    this.avgfps = 0;
+    this.rawfps = 0;
+    this.qty = 0;
+    this.exitTime = 0;
+  }
+  FPSCounter.prototype = {
+    update: function () {
+      var deltaTime = performance.now() - this.exitTime;
+      this.rawfps = 1000 / deltaTime;
+      
+      this.qty++;
+
+      if (performance.now() > 2000) {
+        // do not average first 2 seconds of data because initial loading is heavier than usual.
+        this.avgfps += (this.rawfps - this.avgfps) / this.qty;
+      } else {
+        this.avgfps = this.rawfps;
+      }
+
+      this.exitTime = performance.now();
+    }
+  };
+
+  // instantiate an FPSCounter object
+  var fpsCounter = new FPSCounter();
+
   // start update loop
-  // var FPS = 30;
-  // var frameCount = -1; // use performance.now() to get realtime in milliseconds since startup.
-  // setInterval(function () {
-  //   update();
-  //   draw();
-  // }, 1000 / FPS);
+  // use performance.now() to get realtime in milliseconds since startup.
+  var FPS = 200;
+  var frameCount = -1;
+  setInterval(function () {
+    frameCount++;
+    fpsCounter.update();
+    updateSVG();
+  }, 1000 / FPS);
 });

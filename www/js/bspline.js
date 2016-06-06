@@ -20,7 +20,7 @@ define('bspline', ['vector'], function (Vector) {
       this.makeKnotsLinSpaced();
     },
 
-    // @return {Vector}
+    // returns a Vector object
     calc: function (t) {
       //ensure 0 <= t <= 1
       if (t > 1) {
