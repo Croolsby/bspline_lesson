@@ -3,6 +3,9 @@ define('bspline-model', ['vector'], function (Vector) {
   "use strict";
 
   function BSpline(parent) {
+    if (parent == null) {
+      console.error('A parent must be specified.');
+    }
     this.parent = parent;
 
     // initialize state variables

@@ -40,46 +40,12 @@ require(['bspline'], function (BSpline) {
     fill: "white",
   });
 
-  var bspline = new BSpline(s);
+  var bspline = new BSpline(s, document.getElementById('svg'));
   bspline.model.appendPoint(100, 100);
   bspline.model.appendPoint(200, 200);
   bspline.model.appendPoint(300, 100);
 
-  // var bspline = new BSpline();
-  // bspline.appendPoint(100, 100);
-  // bspline.appendPoint(200, 200);
-  // bspline.appendPoint(300, 100);
-
-  // var bsplineControlLines = s.polyline(bspline.pointsToArray());
-  // bsplineControlLines.attr({
-  //   stroke: '#aaa',
-  //   strokeWidth: 1,
-  //   strokeLinecap: 'round',
-  //   fillOpacity: 0,
-  // });
-
-  // var bsplinePath = s.polyline(bspline.pathToArray());
-  // bsplinePath.attr({
-  //   stroke: '#eee',
-  //   strokeWidth: 2,
-  //   strokeLinecap: 'round',
-  //   fillOpacity: 0,
-  // });
-  // console.log(bsplinePath);
-
-  // var v = bspline.calc(performance.now() / 1000);
-  // var bsplineDot = s.circle(v.x, v.y, 5);
-  // bsplineDot.attr({
-  //   fill: 'red'
-  // });
-
   function updateSVG() {
-    // modify svg by changing attributes
-    // var v = bspline.calc(performance.now() / 1000);
-    // bsplineDot.attr({
-    //   cx: v.x,
-    //   cy: v.y,
-    // });
     bspline.view.update();
 
     fpsText.attr({

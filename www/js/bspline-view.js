@@ -38,6 +38,12 @@ define('bspline-view', [], function () {
   }
 
   View.prototype = {
+    destruct: function () {
+      this.path.remove();
+      this.controlLines.remove();
+      this.dot.remove();
+    },
+
     update: function () {
       var model = this.parent.model;
       

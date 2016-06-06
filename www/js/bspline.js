@@ -3,11 +3,18 @@ define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller'], funct
   'use strict'
 
   // @argument paper = a snap svg paper object
-  function BSpline(paper) {
+  function BSpline(paper, domElement) {
     this.model = new Model(this);
     this.view = new View(this, paper);
-    this.controller = new Controller(this);
+    this.controller = new Controller(this, domElement);
   }
+
+  BSpline.prototype = {
+    destruct: function () {
+      this.view.destruct();
+      this.controller.destruct();
+    }
+  };
 
   return BSpline;
 });
