@@ -1,5 +1,5 @@
 // @author github.com/croolsby
-define('bspline', ["transform", "vector"], function (Transform, Vector) {
+define('bspline', ["behavior"], function (Behavior) {
   "use strict";
 
   function BSpline() {

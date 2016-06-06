@@ -1,10 +1,10 @@
 function componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
 }
 
 function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 require(["bspline"], function (BSpline) {
@@ -68,6 +68,19 @@ require(["bspline"], function (BSpline) {
   //   });
   // };
 
+  // set mouse event listener and handler
+  canvas.addEventListener("mousedown", function () {
+
+  });
+
+  canvas.addEventListener("mouseup", function () {
+
+  });
+
+  canvas.addEventListener("mousemove", function () {
+
+  });
+
   // make canvas resize when browser window is resized
   window.addEventListener('resize', resizeCanvas, false);
   function resizeCanvas() {
@@ -76,4 +89,11 @@ require(["bspline"], function (BSpline) {
   resizeCanvas();
 
   // setInterval(blink, 3000);
+  // start update loop
+  // var FPS = 30;
+  // var frameCount = -1; // use performance.now() to get realtime in milliseconds since startup.
+  // setInterval(function () {
+  //   update();
+  //   draw();
+  // }, 1000 / FPS);
 });
