@@ -40,48 +40,54 @@ require(['bspline'], function (BSpline) {
     fill: "white",
   });
 
-  var bspline = new BSpline();
-  bspline.appendPoint(100, 100);
-  bspline.appendPoint(200, 200);
-  bspline.appendPoint(300, 100);
+  var bspline = new BSpline(s);
+  bspline.model.appendPoint(100, 100);
+  bspline.model.appendPoint(200, 200);
+  bspline.model.appendPoint(300, 100);
 
-  var bsplineControlLines = s.polyline(bspline.pointsToArray());
-  bsplineControlLines.attr({
-    stroke: '#aaa',
-    strokeWidth: 1,
-    strokeLinecap: 'round',
-    fillOpacity: 0,
-  });
+  // var bspline = new BSpline();
+  // bspline.appendPoint(100, 100);
+  // bspline.appendPoint(200, 200);
+  // bspline.appendPoint(300, 100);
 
-  var bsplinePath = s.polyline(bspline.pathToArray());
-  bsplinePath.attr({
-    stroke: '#eee',
-    strokeWidth: 2,
-    strokeLinecap: 'round',
-    fillOpacity: 0,
-  });
-  console.log(bsplinePath);
+  // var bsplineControlLines = s.polyline(bspline.pointsToArray());
+  // bsplineControlLines.attr({
+  //   stroke: '#aaa',
+  //   strokeWidth: 1,
+  //   strokeLinecap: 'round',
+  //   fillOpacity: 0,
+  // });
 
-  var v = bspline.calc(performance.now() / 1000);
-  var bsplineDot = s.circle(v.x, v.y, 5);
-  bsplineDot.attr({
-    fill: 'red'
-  });
+  // var bsplinePath = s.polyline(bspline.pathToArray());
+  // bsplinePath.attr({
+  //   stroke: '#eee',
+  //   strokeWidth: 2,
+  //   strokeLinecap: 'round',
+  //   fillOpacity: 0,
+  // });
+  // console.log(bsplinePath);
+
+  // var v = bspline.calc(performance.now() / 1000);
+  // var bsplineDot = s.circle(v.x, v.y, 5);
+  // bsplineDot.attr({
+  //   fill: 'red'
+  // });
 
   function updateSVG() {
     // modify svg by changing attributes
-    var v = bspline.calc(performance.now() / 1000);
-    bsplineDot.attr({
-      cx: v.x,
-      cy: v.y,
-    });
+    // var v = bspline.calc(performance.now() / 1000);
+    // bsplineDot.attr({
+    //   cx: v.x,
+    //   cy: v.y,
+    // });
+    bspline.view.update();
 
     fpsText.attr({
-      text: 'fps: ' + fpsCounter.avgfps,
+      text: 'avgfps: ' + fpsCounter.avgfps,
     });
 
     fpsText2.attr({
-      text: 'fps: ' + fpsCounter.rawfps,
+      text: 'rawfps: ' + fpsCounter.rawfps,
     });
   }
 
@@ -110,7 +116,7 @@ require(['bspline'], function (BSpline) {
     update: function () {
       var deltaTime = performance.now() - this.exitTime;
       this.rawfps = 1000 / deltaTime;
-      
+
       this.qty++;
 
       if (performance.now() > 2000) {
@@ -129,7 +135,7 @@ require(['bspline'], function (BSpline) {
 
   // start update loop
   // use performance.now() to get realtime in milliseconds since startup.
-  var FPS = 200;
+  var FPS = 90;
   var frameCount = -1;
   setInterval(function () {
     frameCount++;
