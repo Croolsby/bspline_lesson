@@ -8,6 +8,8 @@ function rgbToHex(r, g, b) {
 }
 
 require(["bspline"], function (BSpline) {
+  'use strict'
+
   var s = Snap("#svg");
 
   var colors = {
@@ -20,22 +22,43 @@ require(["bspline"], function (BSpline) {
   var background;
   var onTop;
 
+  background = s.rect(0, 0, window.innerWidth, window.innerHeight);
+  background.attr({
+    fill: colors.gray1,
+  });
+
+  onTop = s.rect(100, 100, window.innerWidth - 200, window.innerHeight - 200);
+  onTop.attr({
+    fill: colors.gray2,
+  });
+
   // set the position of all the svg elements
   // call this function in future to reset
   function defineElements() {
-    background = s.rect(0, 0, window.innerWidth, window.innerHeight);
-    background.attr({
-      fill: colors.gray1,
-    });
-
-    onTop = s.rect(100, 100, window.innerWidth - 200, window.innerHeight - 200);
-    onTop.attr({
-      fill: colors.gray2,
-    });
+    
   }
   defineElements();
 
+  var bspline = new BSpline();
+  bspline.appendPoint(100, 100);
+  bspline.appendPoint(200, 200);
+  bspline.appendPoint(300, 100);
 
+  var bsplineControlLines = s.polyline(bspline.pointsToArray());
+  bsplineControlLines.attr({
+    stroke: '#aaa',
+    strokeWidth: 1,
+    strokeLinecap: 'round',
+    fillOpacity: 0,
+  });
+
+  var bsplinePath = s.polyline(bspline.pathToArray());
+  bsplinePath.attr({
+    stroke: '#eee',
+    strokeWidth: 2,
+    strokeLinecap: 'round',
+    fillOpacity: 0,
+  });
 
   // var circle_1 = s.circle(300, 200, 140);
   // var circle_2 = s.circle(250, 200, 140);
@@ -69,24 +92,32 @@ require(["bspline"], function (BSpline) {
   // };
 
   // set mouse event listener and handler
-  canvas.addEventListener("mousedown", function () {
+  // var svg = document.getElementById('svg');
+  // svg.addEventListener("mousedown", function () {
 
-  });
+  // });
 
-  canvas.addEventListener("mouseup", function () {
+  // svg.addEventListener("mouseup", function () {
 
-  });
+  // });
 
-  canvas.addEventListener("mousemove", function () {
+  // svg.addEventListener("mousemove", function () {
 
-  });
+  // });
 
   // make canvas resize when browser window is resized
   window.addEventListener('resize', resizeCanvas, false);
   function resizeCanvas() {
-    defineElements();
+    // adjust attributes that depend on resize
+    background.attr({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+    onTop.attr({
+      width: window.innerWidth - 200,
+      height: window.innerHeight - 200,
+    });
   }
-  resizeCanvas();
 
   // setInterval(blink, 3000);
   // start update loop
