@@ -17,19 +17,17 @@
       overflow: hidden;
     }
     /*remove scrollbars*/
-    canvas {
+    svg {
       display: block;
     }
   </style>
-  <!--<script type="text/javascript" src="js/jquery-2.2.4.js"></script>-->
-  
+  <script type="text/javascript" src="js/snap.svg-min.js"></script>
 </head>
 
 <body>
-  <!--<canvas id="canvas">Your browser isn't supported.</canvas>-->
   <svg id="svg"></svg>
+  <!--Load snap.svg before running main.-->
   <script data-main="js/main" src="js/require.js"></script>
-  <!--<script type="text/javascript" src="js/fractal-pages.js"></script>-->
 </body>
 
 </html>
