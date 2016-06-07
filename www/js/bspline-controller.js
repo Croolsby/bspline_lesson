@@ -11,7 +11,7 @@ define('bspline-controller', [], function () {
     }
 
     this.parent = parent;
-    this.selectRadius = 10; // distance mouse has to be to select a point.
+    this.selectRadius = 20; // distance mouse has to be to select a point.
     this.selectedPoint = null;
     this.selectedPointIndex = -1;
     this.hovering = true;

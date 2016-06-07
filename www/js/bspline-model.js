@@ -107,7 +107,7 @@ define('bspline-model', ['vector'], function (Vector) {
 
     // returns the path as a flattened/inline array of points.
     pathToArray: function (nDrawPoints) {
-      nDrawPoints = nDrawPoints || 32; // nDrawPoint default to 32
+      nDrawPoints = nDrawPoints || 32 * (this.points.length - 2); // nDrawPoint default to 32
       var linePoints = [];
       for (var i = 0; i < nDrawPoints; i++) {
         var t = i / (nDrawPoints - 1);

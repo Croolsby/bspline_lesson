@@ -13,6 +13,11 @@ define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller'], funct
     destruct: function () {
       this.view.destruct();
       this.controller.destruct();
+    },
+
+    appendPoint: function (x, y) {
+      this.model.appendPoint(x, y);
+      this.view.constructSVGElements();
     }
   };
 

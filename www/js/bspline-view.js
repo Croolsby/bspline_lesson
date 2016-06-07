@@ -15,33 +15,20 @@ define('bspline-view', [], function () {
     this.drawControlLines = false;
     this.drawDot = false; // the dot is animated and travels along the path
 
-    // initialize snap svg elements
-    this.path = paper.polyline([0, 0, 0, 0]);
-    this.path.attr({
-      stroke: '#eee',
-      strokeWidth: 2,
-      strokeLinecap: 'round',
-      fillOpacity: 0,
-    });
-
-    this.controlLines = paper.polyline([0, 0, 0, 0]);
-    this.controlLines.attr({
-      stroke: '#eee',
-      strokeWidth: 1,
-      strokeLinecap: 'round',
-      fillOpacity: 0,
-    });
-
-    this.dot = paper.circle(0, 0, 3);
-    this.dot.attr({
-      fill: '#ee0000'
-    });
+    this.constructSVGElements();
 
     this.point = null;
   }
 
   View.prototype = {
-    destruct: function () {
+    destructSVGElements: function () {
+      if (this.points != null) {
+        for (var i = 0; i < this.points.length; i++) {
+          this.points[i].remove();
+        }
+        this.points = null;
+      }
+
       if (this.path != null) {
         this.path.remove();
         this.path = null;
@@ -60,22 +47,73 @@ define('bspline-view', [], function () {
       }
     },
 
+    constructSVGElements: function () {
+      // ensure all svg elements have been freed before creating replacements.
+      this.destructSVGElements();
+
+      var model = this.parent.model;
+
+      // draw a line segment between each control point
+      this.controlLines = this.paper.polyline(model.pointsToArray());
+      this.controlLines.attr({
+        stroke: '#999',
+        strokeWidth: 4,
+        strokeLinecap: 'round',
+        fillOpacity: 0,
+      });
+
+      // draw a circle for each control point
+      this.points = new Array(model.points.length);
+      for (var i = 0; i < this.points.length; i++) {
+        this.points[i] = this.paper.circle(model.points[i].x, model.points[i].y, 14);
+        this.points[i].attr({
+          fill: '#fff',
+          fillOpacity: 0.5,
+        });
+      }
+
+      // initialize snap svg elements
+      this.path = this.paper.polyline(model.pathToArray());
+      this.path.attr({
+        stroke: '#eee',
+        strokeWidth: 6,
+        strokeLinecap: 'round',
+        fillOpacity: 0,
+      });
+
+      this.dot = this.paper.circle(0, 0, 10);
+      this.dot.attr({
+        fill: '#ee0000'
+      });
+    },
+
     update: function () {
+      // modify atributes
       var model = this.parent.model;
 
       if (model.dirty) {
-        this.path.attr({
-          points: model.pathToArray(),
-        });
+        // update control points
+        for (var i = 0; i < this.points.length; i++) {
+          this.points[i].attr({
+            cx: model.points[i].x,
+            cy: model.points[i].y,
+          });
+        }
 
+        // update control lines
         this.controlLines.attr({
           points: model.pointsToArray(),
+        });
+
+        // update path
+        this.path.attr({
+          points: model.pathToArray(),
         });
 
         model.dirty = false;
       }
 
-      var v = model.calc(performance.now() / 1000);
+      var v = model.calc(performance.now() / 4000);
       this.dot.attr({
         cx: v.x,
         cy: v.y,
@@ -97,7 +135,7 @@ define('bspline-view', [], function () {
             cx: p.x,
             cy: p.y,
             stroke: '#eee',
-            strokeWidth: 1,
+            strokeWidth: 3,
             fillOpacity: 0,
           });
         } else {
@@ -109,7 +147,7 @@ define('bspline-view', [], function () {
             cx: p.x,
             cy: p.y,
             stroke: '#ee0000',
-            strokeWidth: 1,
+            strokeWidth: 3,
             fillOpacity: 0,
           });
         }

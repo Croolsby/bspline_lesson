@@ -30,32 +30,33 @@ require(['bspline'], function (BSpline) {
     fill: colors.gray2,
   });
 
-  var fpsText = s.text(10, 10, "test");
-  fpsText.attr({
-    fill: "white",
-  });
+  // var fpsText = s.text(10, 10, "test");
+  // fpsText.attr({
+  //   fill: "white",
+  // });
 
-  var fpsText2 = s.text(10, 20, "test");
-  fpsText2.attr({
-    fill: "white",
-  });
+  // var fpsText2 = s.text(10, 20, "test");
+  // fpsText2.attr({
+  //   fill: "white",
+  // });
 
   var bspline = new BSpline(s, document.getElementById('svg'));
-  bspline.model.appendPoint(100, 100);
-  bspline.model.appendPoint(200, 200);
-  bspline.model.appendPoint(300, 100);
-  bspline.model.appendPoint(400, 200);
+  bspline.appendPoint(200, 400);
+  bspline.appendPoint(320, 200);
+  bspline.appendPoint(500, 150);
+  bspline.appendPoint(670, 200);
+  bspline.appendPoint(800, 400);
 
   function updateSVG() {
     bspline.view.update();
 
-    fpsText.attr({
-      text: 'avgfps: ' + fpsCounter.avgfps,
-    });
+    // fpsText.attr({
+    //   text: 'avgfps: ' + fpsCounter.avgfps,
+    // });
 
-    fpsText2.attr({
-      text: 'rawfps: ' + fpsCounter.rawfps,
-    });
+    // fpsText2.attr({
+    //   text: 'rawfps: ' + fpsCounter.rawfps,
+    // });
   }
 
   // make canvas resize when browser window is resized
@@ -102,7 +103,7 @@ require(['bspline'], function (BSpline) {
 
   // start update loop
   // use performance.now() to get realtime in milliseconds since startup.
-  var FPS = 90;
+  var FPS = 100;
   var frameCount = -1;
   setInterval(function () {
     frameCount++;
