@@ -51,7 +51,7 @@ define('knot-controller', ['vector'], function (Vector) {
       var hit = hitResult[0];
       thisController.selectedKnot = hit;
       thisController.selectedKnotIndex = hitResult[1];
-      console.log(hitResult);
+      // console.log(hitResult);
     }
     thisController.hovering = false;
   };
@@ -67,8 +67,6 @@ define('knot-controller', ['vector'], function (Vector) {
   Controller.mousemoveHandeler = function (bspline, ev) {
     // note that mousemove is always called after mouseup
     var thisController = bspline.knotController;
-
-    
 
     if (thisController.selectedKnot == null || thisController.hovering) {
       // draw something to indicate that the knot can be clicked on.
@@ -104,7 +102,13 @@ define('knot-controller', ['vector'], function (Vector) {
 
   Controller.findHit = function (bspline, x, y) {
     var knots = bspline.knotView.knots;
-    var raw = knots[0].node.attributes[0].value.substring(4).split(',');
+    try {
+      var raw = knots[0].node.attributes[0].value.substring(4).split(',');
+    } catch(err) {
+      // this happens because the event is triggered before any knots have been made.
+      return null;
+    }
+    
     // triangle defined in object coordinates
     var triangleObject = new Array(3);
     triangleObject[0] = new Vector(Number(raw[0]), Number(raw[1]));
@@ -112,6 +116,9 @@ define('knot-controller', ['vector'], function (Vector) {
     triangleObject[2] = new Vector(Number(raw[4]), Number(raw[5]));
 
     var p = new Vector(x, y);
+    var hitResult = null;
+    var x0 = bspline.knotView.x0;
+    var lineLength = bspline.knotView.knotLineLength;
 
     for (var i = 0; i < knots.length; i++) {
       var translation = new Vector(knots[i].matrix.e, knots[i].matrix.f);
@@ -123,11 +130,16 @@ define('knot-controller', ['vector'], function (Vector) {
       // approximate triangle hit by bounding box
       if (p1.x <= p.x && p.x <= p0.x) {
         if (p0.y <= p.y && p.y <= p2.y) {
-          return [bspline.model.knots[i], i];
+          hitResult = [bspline.model.knots[i], i];
+          // break;
+          var percentOfLine = (p2.x - x0) / lineLength;
+          if (percentOfLine > 0.5) {
+            break;
+          }
         }
       }
     }
-    return null;
+    return hitResult;
   };
 
   // Controller.isPointInTriangle = function (p, p0, p1, p2) {

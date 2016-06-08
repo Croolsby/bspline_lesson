@@ -12,6 +12,8 @@ define('knot-view', [], function () {
     this.paper = paper;
 
     this.knotLineLength = 400;
+    this.x0 = 200;
+    this.y0 = 400;
 
     this.knotLine = null;
     this.knots = [];
@@ -69,8 +71,8 @@ define('knot-view', [], function () {
         this.constructSVGElements();
       }
 
-      var x0 = 200;
-      var y0 = 400;
+      var x0 = this.x0;
+      var y0 = this.y0;
 
       this.knotLine.attr({
         x1: x0,

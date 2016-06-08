@@ -31,6 +31,7 @@ define('bspline-model', ['vector'], function (Vector) {
 
     // returns a Vector object
     calc: function (t) {
+      // console.log('entry');
       //ensure 0 <= t <= 1
       if (t > 1) {
         // allow t = 1
@@ -59,6 +60,9 @@ define('bspline-model', ['vector'], function (Vector) {
       if (I < this.k - 2) {
         I = this.k - 2;
       }
+      if (I > n - 2) {
+        I = n - 2;
+      }
 
       // d[generation][point of that generation] : Vector[][]
       var d = BSpline.create2DArray(this.k, n - 1); // shouldn't this be k -1 not k? and n - 1?
@@ -67,7 +71,7 @@ define('bspline-model', ['vector'], function (Vector) {
       for (var i = 0; i < n; i++) {
         d[0][i] = this.points[i]; // points[i] type is Transform
 
-        // if (t == 0) {
+        // if (I != 1) {
         //   console.log('d[' + 0 + '][' + i + ']: ' + d[0][i].x + ', ' + d[0][i].y);
         // }
       }
@@ -86,17 +90,16 @@ define('bspline-model', ['vector'], function (Vector) {
             d[j - 1][i].y, d[j - 1][i + 1].y);
           d[j][i] = new Vector(x, y);
 
-          // if (t == 0) {
-          //   console.log('d[' + j + '][' + i + ']: ' + d[j][i].x + ', ' + d[j][i].y);
+          // if (I != 1) {
+          //   if (this.knots[i + j - 1] == this.knots[i + this.k - 1]) {
+          //     console.log("overlap");
 
-          //   if (j == 2) {
-          //     console.log('uBar: ' + uBar);
+          //   }
+          //   console.log('d[' + j + '][' + i + ']: ' + d[j][i].x + ', ' + d[j][i].y);
           //     console.log('BSpline.lerp('+uBar+','+ this.knots[i + j - 1]+','+ this.knots[i + this.k - 1]+','+ d[j - 1][i].x+','+ d[j - 1][i + 1].x+')');
           //     console.log('BSpline.lerp('+uBar+','+ this.knots[i + j - 1]+','+ this.knots[i + this.k - 1]+','+ d[j - 1][i].y+','+ d[j - 1][i + 1].y+')');
           //     console.log(x);
           //     console.log(y);
-          //   }
-          // }
         }
       }
 
@@ -198,12 +201,13 @@ define('bspline-model', ['vector'], function (Vector) {
   };
 
   BSpline.lerp = function (t, inLeft, inRight, outLeft, outRight) {
+    // console.log('lerp(' + t + ', ' + inLeft + ', ' + inRight + ', ' + outLeft + ', ' + outRight);
     var diff = inRight - inLeft;
     if (diff == 0) {
       // if the inLeft and inRight are the same value,
-      // then pretend t is half way between inLeft and inRight.
-      // thus the result is halfway between outLeft and outRight.
-      return (outLeft + outRight) / 2;
+      // then pretend t is at inRight.
+      // thus the result is at outRight.
+      return outRight;
     }
     return (inRight - t) / diff * outLeft + (t - inLeft) / diff * outRight;
   };
