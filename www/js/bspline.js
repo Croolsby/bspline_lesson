@@ -1,12 +1,15 @@
 // @author github.com/croolsby
-define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller'], function(Model, View, Controller) {
+define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller', 'knot-view', 'knot-controller'], function(BSplineModel, BSplineView, BSplineController, KnotView, KnotController) {
   'use strict'
 
   // @argument paper = a snap svg paper object
   function BSpline(paper, domElement) {
-    this.model = new Model(this);
-    this.view = new View(this, paper);
-    this.controller = new Controller(this, domElement);
+    this.model = new BSplineModel(this);
+    this.view = new BSplineView(this, paper);
+    this.controller = new BSplineController(this, domElement);
+
+    this.knotView = new KnotView(this, paper);
+    this.knotController = new KnotController(this, domElement);
   }
 
   BSpline.prototype = {
@@ -18,6 +21,13 @@ define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller'], funct
     appendPoint: function (x, y) {
       this.model.appendPoint(x, y);
       this.view.constructSVGElements();
+    },
+
+    update: function () {
+      this.view.update();
+      this.knotView.update();
+      // the model should be clean after an update.
+      this.model.dirty = false;
     }
   };
 

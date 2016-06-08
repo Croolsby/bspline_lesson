@@ -58,7 +58,7 @@ define('bspline-model', ['vector'], function (Vector) {
       var I = this.findIndex(uBar);
 
       // d[generation][point of that generation] : Vector[][]
-      var d = BSpline.create2DArray(this.k, n); // shouldn't this be k -1 not k? and n - 1?
+      var d = BSpline.create2DArray(this.k, n - 1); // shouldn't this be k -1 not k? and n - 1?
 
       // init first generation
       for (var i = 0; i < n; i++) {
@@ -103,6 +103,33 @@ define('bspline-model', ['vector'], function (Vector) {
       for (var i = 0; i < nKnots; i++) {
         this.knots[i] = (1.0 * i / (n + this.k - 3));
       }
+    },
+
+    setKnot: function (index, value) {
+      // knots are bounded by [0, 1]
+      // knots may not crossover.
+
+      // prevent knot from going out of bounds
+      // there is a hard bound at [0, 1],
+      if (value < 0) {
+        value = 0;
+      }
+      if (value > 1) {
+        value = 1;
+      }
+      // there may be a smaller bound caused by neighboring knots: [knot[i-1], knot[i+1]]
+      if (value < this.knots[index - 1]) {
+        value = this.knots[index - 1];
+      }
+      if (value > this.knots[index + 1]) {
+        value = this.knots[index + 1];
+      }
+
+      this.knots[index] = value;
+
+      this.dirty = true;
+
+      console.log(this.knots);
     },
 
     // returns the path as a flattened/inline array of points.

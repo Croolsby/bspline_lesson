@@ -11,12 +11,12 @@ define('bspline-controller', [], function () {
     }
 
     this.parent = parent;
+    this.domElement = domElement; // reference used for destruction
+
     this.selectRadius = 20; // distance mouse has to be to select a point.
     this.selectedPoint = null;
     this.selectedPointIndex = -1;
     this.hovering = true;
-
-    this.domElement = domElement; // reference used for destruction
 
     // 'this' inside of the anonymous function given to addEventListener is not that same as 'this' inside 'function Controller() {}'.
     // these helper functions need to be named for destruction

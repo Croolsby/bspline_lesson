@@ -1,5 +1,5 @@
 // @author github.com/croolsby
-define('bspline-view', [], function () {
+define('bspline-view', ['knot-view'], function (KnotView) {
   'use strict'
 
   function View(parent, paper) {
@@ -56,9 +56,10 @@ define('bspline-view', [], function () {
       // draw a line segment between each control point
       this.controlLines = this.paper.polyline(model.pointsToArray());
       this.controlLines.attr({
-        stroke: '#999',
+        stroke: '#fff',
         strokeWidth: 4,
         strokeLinecap: 'round',
+        strokeOpacity: 0.5,
         fillOpacity: 0,
       });
 
@@ -109,8 +110,6 @@ define('bspline-view', [], function () {
         this.path.attr({
           points: model.pathToArray(),
         });
-
-        model.dirty = false;
       }
 
       var v = model.calc(performance.now() / 4000);

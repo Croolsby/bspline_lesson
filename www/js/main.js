@@ -41,14 +41,14 @@ require(['bspline'], function (BSpline) {
   // });
 
   var bspline = new BSpline(s, document.getElementById('svg'));
-  bspline.appendPoint(200, 400);
-  bspline.appendPoint(320, 200);
-  bspline.appendPoint(500, 150);
-  bspline.appendPoint(670, 200);
-  bspline.appendPoint(800, 400);
+  bspline.appendPoint(180, 320);
+  bspline.appendPoint(300, 160);
+  bspline.appendPoint(480, 170);
+  bspline.appendPoint(600, 300);
+  bspline.appendPoint(750, 200);
 
   function updateSVG() {
-    bspline.view.update();
+    bspline.update();
 
     fpsText.attr({
       text: 'avgfps: ' + fpsCounter.avgfps,
