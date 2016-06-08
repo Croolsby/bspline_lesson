@@ -45,7 +45,7 @@ require(['bspline'], function (BSpline) {
   bspline.appendPoint(300, 160);
   bspline.appendPoint(480, 170);
   bspline.appendPoint(600, 300);
-  bspline.appendPoint(750, 200);
+  // bspline.appendPoint(750, 200);
 
   function updateSVG() {
     bspline.update();

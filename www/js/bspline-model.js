@@ -56,6 +56,9 @@ define('bspline-model', ['vector'], function (Vector) {
 
       // find index I such that u_I <= u^bar <= u_(I + 1)
       var I = this.findIndex(uBar);
+      if (I < this.k - 2) {
+        I = this.k - 2;
+      }
 
       // d[generation][point of that generation] : Vector[][]
       var d = BSpline.create2DArray(this.k, n - 1); // shouldn't this be k -1 not k? and n - 1?
@@ -63,19 +66,37 @@ define('bspline-model', ['vector'], function (Vector) {
       // init first generation
       for (var i = 0; i < n; i++) {
         d[0][i] = this.points[i]; // points[i] type is Transform
+
+        // if (t == 0) {
+        //   console.log('d[' + 0 + '][' + i + ']: ' + d[0][i].x + ', ' + d[0][i].y);
+        // }
       }
 
       //print("I: " + I);
       //print("uBar: " + uBar);
-
+      // console.log('I: ' + I);
       for (var j = 1; j <= (this.k - 1); j++) {
         for (var i = (I - (this.k - 2)); i <= I - j + 1; i++) {
+
+          // console.log('j, i: ' + j + ',' + i);
           // the i'th point of generation j
           var x = BSpline.lerp(uBar, this.knots[i + j - 1], this.knots[i + this.k - 1],
             d[j - 1][i].x, d[j - 1][i + 1].x);
           var y = BSpline.lerp(uBar, this.knots[i + j - 1], this.knots[i + this.k - 1],
             d[j - 1][i].y, d[j - 1][i + 1].y);
           d[j][i] = new Vector(x, y);
+
+          // if (t == 0) {
+          //   console.log('d[' + j + '][' + i + ']: ' + d[j][i].x + ', ' + d[j][i].y);
+
+          //   if (j == 2) {
+          //     console.log('uBar: ' + uBar);
+          //     console.log('BSpline.lerp('+uBar+','+ this.knots[i + j - 1]+','+ this.knots[i + this.k - 1]+','+ d[j - 1][i].x+','+ d[j - 1][i + 1].x+')');
+          //     console.log('BSpline.lerp('+uBar+','+ this.knots[i + j - 1]+','+ this.knots[i + this.k - 1]+','+ d[j - 1][i].y+','+ d[j - 1][i + 1].y+')');
+          //     console.log(x);
+          //     console.log(y);
+          //   }
+          // }
         }
       }
 
@@ -87,13 +108,23 @@ define('bspline-model', ['vector'], function (Vector) {
       while (u > this.knots[i]) {
         i++;
       }
+      i--;
+      // at this point in execution, u > knots[i] 
+
+      // if multiple knots are overlapping, accept the first of these overlapping knots.
+      // while (i != 0 && (this.knots[i - 1] == this.knots[i])) {
+      //   // true if the previous knot is overlapping this knot.
+      //   i--;
+      // }
+
+      return i;
 
       // The following is so that u is in [u_I, u_I+1)
-      if (u == this.knots[this.k - 2]) {
-        return i;
-      } else {
-        return i - 1;
-      }
+      // if (u == this.knots[this.k - 2]) {
+      //   return i;
+      // } else {
+      //   return i - 1;
+      // }
     },
 
     makeKnotsLinSpaced: function () {
@@ -129,7 +160,7 @@ define('bspline-model', ['vector'], function (Vector) {
 
       this.dirty = true;
 
-      console.log(this.knots);
+      // console.log(this.knots);
     },
 
     // returns the path as a flattened/inline array of points.
@@ -144,7 +175,7 @@ define('bspline-model', ['vector'], function (Vector) {
       }
       return linePoints;
     },
-    
+
     pointsToArray: function () {
       var result = [];
       for (var i = 0; i < this.points.length; i++) {
@@ -168,6 +199,12 @@ define('bspline-model', ['vector'], function (Vector) {
 
   BSpline.lerp = function (t, inLeft, inRight, outLeft, outRight) {
     var diff = inRight - inLeft;
+    if (diff == 0) {
+      // if the inLeft and inRight are the same value,
+      // then pretend t is half way between inLeft and inRight.
+      // thus the result is halfway between outLeft and outRight.
+      return (outLeft + outRight) / 2;
+    }
     return (inRight - t) / diff * outLeft + (t - inLeft) / diff * outRight;
   };
 
