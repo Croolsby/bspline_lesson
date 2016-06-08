@@ -87,12 +87,15 @@ define('knot-controller', ['vector'], function (Vector) {
         // knots cannot crossover each other.
         var knotLineLength = bspline.knotView.knotLineLength;
         
-        var delta = ev.clientX - thisController.lastMouse[0];
-        delta /= knotLineLength;
+        // var delta = ev.clientX - thisController.lastMouse[0];
+        // delta /= knotLineLength; 
+        var x0 = bspline.knotView.x0;
+        var x = (ev.clientX - x0) / knotLineLength;
 
         var index = thisController.selectedKnotIndex;
 
-        bspline.model.setKnot(index, bspline.model.knots[index] + delta);
+        // bspline.model.setKnot(index, bspline.model.knots[index] + delta);
+        bspline.model.setKnot(index, x);
       }
     }
 
