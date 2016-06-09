@@ -98,7 +98,7 @@ define('bspline-controller', [], function () {
     }
 
     return null;
-  }
+  };
 
   return Controller;
 });

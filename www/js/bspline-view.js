@@ -112,7 +112,8 @@ define('bspline-view', ['knot-view'], function (KnotView) {
         });
       }
 
-      var v = model.calc(performance.now() / 4000);
+      // var v = model.calc(performance.now() / 4000);
+      var v = model.calc(this.parent.deboorController.t);
       this.dot.attr({
         cx: v.x,
         cy: v.y,

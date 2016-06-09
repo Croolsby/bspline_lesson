@@ -17,7 +17,7 @@ define('knot-controller', ['vector'], function (Vector) {
     this.selectedKnotIndex = -1;
     this.hovering = true;
 
-    this.lastMouse = [0, 0];
+    this.lastMouse = [0, 0]; // used to calculate a delta
 
     // 'this' inside of the anonymous function given to addEventListener is not that same as 'this' inside 'function Controller() {}'.
     // these helper functions need to be named for destruction

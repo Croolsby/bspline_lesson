@@ -22,6 +22,7 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
     this.tLine = null;
     this.uBarLine = null;
     this.vLine = null;
+    this.controlDot = null;
     this.lerpLines = [];
     this.gradients = []; // one gradient for each lerp line.
 
@@ -62,16 +63,26 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
         strokeWidth: 4,
         strokeLinecap: 'round',
       };
+      this.controlDotStyle = {
+        cx: this.parent.knotView.x0,
+        cy: this.parent.knotView.y0 + this.tLineYOffset,
+        r: 10,
+        fill: '#e00',
+        fillOpacity: 1,
+      };
 
+      // instantiate the elements
       this.tLine = this.paper.line(0, 0, 0, 0);
       this.tLine.attr(this.tLineStyle);
-
 
       this.uBarLine = this.paper.line(0, 0, 0, 0);
       this.uBarLine.attr(this.uBarLineStyle);
 
       this.vLine = this.paper.line(0, 0, 0, 0);
       this.vLine.attr(this.vLineStyle);
+
+      this.controlDot = this.paper.circle(0, 0, 0);
+      this.controlDot.attr(this.controlDotStyle);
 
       // create the lerpLines and gradients
       var model = this.parent.model;
@@ -117,6 +128,11 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
         this.vLine = null;
       }
 
+      if (this.controlDot != null) {
+        this.controlDot.remove();
+        this.controlDot = null;
+      }
+
       // remove lerpLines and gradients
       for (var i = 0; i < this.lerpLines.length; i++) {
         if (this.lerpLines[i] != null) {
@@ -151,7 +167,8 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       }
 
       // update the vertical line
-      var t = (performance.now() / 4000) % 1;
+      // var t = (performance.now() / 4000) % 1;
+      var t = this.parent.deboorController.t;
       if (t > 1) {
         // allow t = 1
         t = t % 1;
@@ -159,6 +176,10 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       this.vLineStyle.x1 = knotView.x0 + uBarBeginOffset + t * model.uBarRange() * knotView.knotLineLength;
       this.vLineStyle.x2 = knotView.x0 + uBarBeginOffset + t * model.uBarRange() * knotView.knotLineLength;
       this.vLine.attr(this.vLineStyle);
+
+      // update controlDot
+      this.controlDotStyle.cx = knotView.x0 + uBarBeginOffset + t * model.uBarRange() * knotView.knotLineLength;
+      this.controlDot.attr(this.controlDotStyle);
 
       // update the lerpLines and gradients
       // which set of lerp lines to draw depends on I, which depends on t.

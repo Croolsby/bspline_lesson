@@ -151,8 +151,6 @@ define('bspline-model', ['vector'], function (Vector) {
           this.colors[i] = '#0000ff';
         }
       }
-      
-      console.log(this.colors);
     },
 
     setKnot: function (index, value) {

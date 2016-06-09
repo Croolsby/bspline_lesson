@@ -1,5 +1,5 @@
 // @author github.com/croolsby
-define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller', 'knot-view', 'knot-controller', 'deboor-view'], function(BSplineModel, BSplineView, BSplineController, KnotView, KnotController, DeboorView) {
+define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller', 'knot-view', 'knot-controller', 'deboor-view', 'deboor-controller'], function(BSplineModel, BSplineView, BSplineController, KnotView, KnotController, DeboorView, DeboorController) {
   'use strict'
 
   // @argument paper = a snap svg paper object
@@ -12,12 +12,14 @@ define('bspline', ['bspline-model', 'bspline-view', 'bspline-controller', 'knot-
     this.knotController = new KnotController(this, domElement);
 
     this.deboorView = new DeboorView(this, paper);
+    this.deboorController = new DeboorController(this, domElement);
   }
 
   BSpline.prototype = {
     destruct: function () {
       this.view.destruct();
       this.controller.destruct();
+      // Todo hook up destructs
     },
 
     appendPoint: function (x, y) {
