@@ -1,11 +1,37 @@
 // declaring these two functions to use them in console. 
-function componentToHex(c) {
-  var hex = c.toString(16);
-  return hex.length == 1 ? "0" + hex : hex;
+// Warning: these global methods are being called in bspline-model.js
+function rgbToHex(r, g, b) {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-function rgbToHex(r, g, b) {
-  return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function randomInt(max) {
+  return Math.floor(Math.random() * (max + 1));
+}
+
+function randomHex() {
+  return rgbToHex(randomInt(255), randomInt(255), randomInt(255));
+}
+
+function lerpColor(a, b, amount) {
+
+  var ah = parseInt(a.replace(/#/g, ''), 16),
+    ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+    bh = parseInt(b.replace(/#/g, ''), 16),
+    br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+    rr = ar + amount * (br - ar),
+    rg = ag + amount * (bg - ag),
+    rb = ab + amount * (bb - ab);
+
+  return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
 }
 
 require(['bspline'], function (BSpline) {

@@ -15,14 +15,15 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
     this.lineGap = 35;
     this.tLineYOffset = -this.lineGap * 2;
     this.uBarLineYOffset = -this.lineGap;
-    this.vLineYOffset = this.tLineYOffset - this.lineGap/2;
-    
+    this.vLineYOffset = this.tLineYOffset - this.lineGap / 2;
+
 
     // declare svg elements:
     this.tLine = null;
     this.uBarLine = null;
     this.vLine = null;
     this.lerpLines = [];
+    this.gradients = []; // one gradient for each lerp line.
 
     this.constructSVGElements();
   }
@@ -72,7 +73,7 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       this.vLine = this.paper.line(0, 0, 0, 0);
       this.vLine.attr(this.vLineStyle);
 
-      // create the lerpLines
+      // create the lerpLines and gradients
       var model = this.parent.model;
       var kmin1 = model.k - 1;
       var nLerpLines = kmin1 * (kmin1 + 1) / 2; // for example, if k = 4, then there are 3 + 2 + 1 lerp lines.
@@ -88,6 +89,15 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
           strokeLinecap: 'round',
         });
         this.lerpLines.push(line);
+
+        // gradients:
+        // this.gradient = this.paper.gradient('L(0, 0, 1, 0)#0e0-#ee0');
+        // initial values don't matter because they will be overwritten in this.update()
+        // it is important that the L is captial (absolute rather than relative)
+        // and important that y1 == y2
+        var grad = this.paper.gradient('L(0, 0, 0, 0)#000-000');
+        this.gradients.push(grad);
+        line.attr({ stroke: grad });
       }
     },
 
@@ -107,13 +117,18 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
         this.vLine = null;
       }
 
+      // remove lerpLines and gradients
       for (var i = 0; i < this.lerpLines.length; i++) {
         if (this.lerpLines[i] != null) {
           this.lerpLines[i].remove();
-          this.lerpLines = null;
+          this.lerpLines[i] = null;
+
+          this.gradients[i].remove();
+          this.gradients[i] = null;
         }
       }
       this.lerpLines = [];
+      this.gradients = [];
     },
 
     update: function () {
@@ -145,7 +160,7 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       this.vLineStyle.x2 = knotView.x0 + uBarBeginOffset + t * model.uBarRange() * knotView.knotLineLength;
       this.vLine.attr(this.vLineStyle);
 
-      // update the lerpLines
+      // update the lerpLines and gradients
       // which set of lerp lines to draw depends on I, which depends on t.
       var n = model.points.length;
       // transform t to u^bar
@@ -158,12 +173,48 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       var I = model.findIndex(uBar);
       // console.log(I);
       var lineCounter = 0;
+      var d10Color = null;
+      var d11Color = null;
+      var swap = false;
       for (var j = 1; j <= (model.k - 1); j++) {
         for (var i = (I - (model.k - 2)); i <= I - j + 1; i++) {
           this.lerpLines[lineCounter].attr({
             x1: knotView.x0 + model.knots[i + j - 1] * knotView.knotLineLength,
             x2: knotView.x0 + model.knots[i + model.k - 1] * knotView.knotLineLength,
           });
+
+          // update gradient
+          this.gradients[lineCounter].attr({
+            x1: knotView.x0 + model.knots[i + j - 1] * knotView.knotLineLength,
+            x2: knotView.x0 + model.knots[i + model.k - 1] * knotView.knotLineLength,
+          });
+          if (j == 1) {
+            var stops = this.gradients[lineCounter].stops();
+            stops[0].attr({
+              stopColor: model.colors[i],
+            });
+            stops[1].attr({
+              stopColor: model.colors[i + 1],
+            });
+            var p = BSpline.lerp(uBar, model.knots[i + j - 1], model.knots[i + model.k -1], 0, 1);
+            if (!swap) {
+              
+              d10Color = lerpColor(model.colors[i], model.colors[i + 1], p);
+              swap = true;
+            } else {
+              d11Color = lerpColor(model.colors[i], model.colors[i + 1], p);
+              swap = false;
+            }
+          } else if (j == 2) {
+            var stops = this.gradients[lineCounter].stops();
+            stops[0].attr({
+              stopColor: d10Color,
+            });
+            stops[1].attr({
+              stopColor: d11Color,
+            });
+          }
+
           lineCounter++;
         }
       }
@@ -171,6 +222,8 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       // BSpline.lerp(uBar, 
       //       this.knots[i + j - 1], this.knots[i + this.k - 1],
       //       d[j - 1][i].x, d[j - 1][i + 1].x);
+      // this.gradient = this.paper.gradient('L(0, 0, 1, 0)#0e0-#ee0');
+      // this.gradient.stops()[1].attr({stopColor: '#00e'});
     },
   };
 

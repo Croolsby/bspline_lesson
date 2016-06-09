@@ -11,6 +11,7 @@ define('bspline-model', ['vector'], function (Vector) {
     // initialize state variables
     this.position = new Vector(0, 0, 0);
     this.points = []; // array of Vector
+    this.colors = [];
     this.knots = [];
     this.k = 3; // degree
 
@@ -25,6 +26,8 @@ define('bspline-model', ['vector'], function (Vector) {
       x = x || this.points[this.points.length - 1] || this.position.x;
       y = y || this.points[this.points.length - 1] || this.position.y;
       this.points.push(new Vector(x, y));
+      this.colors.push(randomHex());
+      this.makeColorsAlternate();
       this.makeKnotsLinSpaced();
       this.dirty = true;
     },
@@ -57,7 +60,7 @@ define('bspline-model', ['vector'], function (Vector) {
 
       // find index I such that u_I <= u^bar <= u_(I + 1)
       var I = this.findIndex(uBar);
-      
+
 
       // d[generation][point of that generation] : Vector[][]
       var d = BSpline.create2DArray(this.k, n - 1); // shouldn't this be k -1 not k? and n - 1?
@@ -138,6 +141,18 @@ define('bspline-model', ['vector'], function (Vector) {
       for (var i = 0; i < nKnots; i++) {
         this.knots[i] = (1.0 * i / (n + this.k - 3));
       }
+    },
+
+    makeColorsAlternate: function () {
+      for (var i = 0; i < this.colors.length; i++) {
+        if (i % 2 == 0) {
+          this.colors[i] = '#ff0000';
+        } else {
+          this.colors[i] = '#0000ff';
+        }
+      }
+      
+      console.log(this.colors);
     },
 
     setKnot: function (index, value) {

@@ -68,7 +68,7 @@ define('bspline-view', ['knot-view'], function (KnotView) {
       for (var i = 0; i < this.points.length; i++) {
         this.points[i] = this.paper.circle(model.points[i].x, model.points[i].y, 14);
         this.points[i].attr({
-          fill: '#fff',
+          fill: model.colors[i],
           fillOpacity: 0.5,
         });
       }
