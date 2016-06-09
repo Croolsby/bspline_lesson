@@ -30,10 +30,16 @@ require(['bspline'], function (BSpline) {
     fill: colors.gray2,
   });
 
-  var fpsText = s.text(10, 10, "test");
+  var fpsText = s.text(10, 15, "test");
   fpsText.attr({
     fill: "white",
   });
+
+  var wipText = s.text(300, 15, "Work In Progress");
+  wipText.attr({
+    fill: 'white',
+  });
+  wipText.attr('xlink:href', 'https://github.com/croolsby/bspline_lesson');
 
   // var fpsText2 = s.text(10, 20, "test");
   // fpsText2.attr({
@@ -51,7 +57,7 @@ require(['bspline'], function (BSpline) {
     bspline.update();
 
     fpsText.attr({
-      text: 'avgfps: ' + fpsCounter.avgfps,
+      text: 'fps: ' + fpsCounter.avgfps,
     });
 
     // fpsText2.attr({
@@ -75,6 +81,16 @@ require(['bspline'], function (BSpline) {
       height: window.innerHeight - 200,
     });
   }
+
+  // prevent default event behavior
+  // this fixes firefox dragging image problem,
+  // however, now text isn't selectable....
+  var defaultPreventer = function (ev) {
+    ev.preventDefault();
+  }
+  window.addEventListener('mousedown', defaultPreventer);
+  window.addEventListener('mouseup', defaultPreventer);
+  window.addEventListener('mousemove', defaultPreventer);
 
   // declare an FPSCounter object
   function FPSCounter() {

@@ -57,12 +57,7 @@ define('bspline-model', ['vector'], function (Vector) {
 
       // find index I such that u_I <= u^bar <= u_(I + 1)
       var I = this.findIndex(uBar);
-      if (I < this.k - 2) {
-        I = this.k - 2;
-      }
-      if (I > n - 2) {
-        I = n - 2;
-      }
+      
 
       // d[generation][point of that generation] : Vector[][]
       var d = BSpline.create2DArray(this.k, n - 1); // shouldn't this be k -1 not k? and n - 1?
@@ -119,6 +114,12 @@ define('bspline-model', ['vector'], function (Vector) {
       //   // true if the previous knot is overlapping this knot.
       //   i--;
       // }
+      if (i < this.k - 2) {
+        i = this.k - 2;
+      }
+      if (i > this.points.length - 2) {
+        i = this.points.length - 2;
+      }
 
       return i;
 
@@ -186,6 +187,18 @@ define('bspline-model', ['vector'], function (Vector) {
         result.push(this.points[i].y);
       }
       return result;
+    },
+
+    uBarBegin: function () {
+      return this.knots[this.k - 2];
+    },
+
+    uBarEnd: function () {
+      return this.knots[this.points.length - 1];
+    },
+
+    uBarRange: function () {
+      return this.uBarEnd() - this.uBarBegin();
     },
   }; // close BSpline.prototype = { ... };
 

@@ -35,7 +35,7 @@ define('knot-view', [], function () {
       var knots = this.parent.model.knots;
       this.knots = new Array(knots.length);
       for (var i = 0; i < knots.length; i++) {
-        this.knots[i] = this.paper.polyline([0, 0, 12, -20, -12, -20, 0, 0]);
+        this.knots[i] = this.paper.polyline([0, 0, 11, -18, -11, -18, 0, 0]);
         this.knots[i].attr({
           stroke: '#fff',
           strokeWidth: 4,

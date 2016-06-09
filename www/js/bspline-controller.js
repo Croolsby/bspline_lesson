@@ -21,15 +21,12 @@ define('bspline-controller', [], function () {
     // 'this' inside of the anonymous function given to addEventListener is not that same as 'this' inside 'function Controller() {}'.
     // these helper functions need to be named for destruction
     this.mousedownHelper = function (ev) {
-      ev.preventDefault();
       Controller.mousedownHandeler(parent, ev);
     };
     this.mouseupHelper = function (ev) {
-      ev.preventDefault();
       Controller.mouseupHandeler(parent, ev);
     };
     this.mousemoveHelper = function (ev) {
-      ev.preventDefault();
       Controller.mousemoveHandeler(parent, ev);
     };
     this.domElement.addEventListener('mousedown', this.mousedownHelper);
