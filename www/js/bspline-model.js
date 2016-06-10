@@ -16,9 +16,10 @@ define('bspline-model', ['vector'], function (Vector) {
     // d[generation][point of that generation]
     this.d = [];
     this.t = 0;
+    this.I = 0;
     // calcPoint contains the last valid (valid as in no error) return of calc().
     this.calcPoint = new Vector(0, 0);
-    this.colors = [];
+    this.pathAsArray = [];
     this.knots = [];
     this.k = 3; // degree
 
@@ -33,12 +34,20 @@ define('bspline-model', ['vector'], function (Vector) {
       x = x || this.points[this.points.length - 1] || this.position.x;
       y = y || this.points[this.points.length - 1] || this.position.y;
       this.points.push(new Vector(x, y));
-      this.colors.push(randomHex());
       this.makeKnotsLinSpaced();
       this.dirty = true;
-
+      // console.log('appendPoint');
       // call calc to recompute this.d and this.calcPoint. 
       this.calc(this.t);
+      this.pathAsArray = this.pathToArray();
+    },
+
+    setPoint: function (i, x, y) {
+      this.points[i].x = x;
+      this.points[i].y = y;
+      this.calc(this.t);
+      // console.log('setPoint called');
+      this.pathAsArray = this.pathToArray();
     },
 
     // returns a Vector object
@@ -100,8 +109,9 @@ define('bspline-model', ['vector'], function (Vector) {
           //     console.log(y);
         }
       }
-
+      
       // save the return value and the corresponding t.
+      this.I = I;
       this.t = t;
       this.calcPoint = this.d[this.k - 1][I - (this.k - 2)] 
       return this.calcPoint;
@@ -157,12 +167,18 @@ define('bspline-model', ['vector'], function (Vector) {
       this.knots[index] = value;
 
       this.dirty = true;
-
+      this.calc(this.t);
+      this.pathAsArray = this.pathToArray();
       // console.log(this.knots);
     },
 
     // returns the path as a flattened/inline array of points.
     pathToArray: function (nDrawPoints) {
+      // save these values because we will call calc and they will be overwritten but we don't want them to.
+      var saveT = this.t;
+      var saveI = this.I;
+      var saveCalcPoint = this.calcPoint;
+
       nDrawPoints = nDrawPoints || 32 * (this.points.length - 2); // nDrawPoint default to 32
       var linePoints = [];
       for (var i = 0; i < nDrawPoints; i++) {
@@ -171,6 +187,11 @@ define('bspline-model', ['vector'], function (Vector) {
         linePoints.push(v.x);
         linePoints.push(v.y);
       }
+      // console.log('pathToArray called');
+      this.t = saveT;
+      this.I = saveI;
+      this.calcPoint = saveCalcPoint;
+
       return linePoints;
     },
 

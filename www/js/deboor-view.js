@@ -24,7 +24,7 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
     this.vLine = null;
     this.controlDot = null;
     this.lerpLines = [];
-    this.gradients = []; // one gradient for each lerp line.
+    // this.gradients = []; // one gradient for each lerp line.
 
     this.constructSVGElements();
   }
@@ -102,13 +102,12 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
         this.lerpLines.push(line);
 
         // gradients:
-        // this.gradient = this.paper.gradient('L(0, 0, 1, 0)#0e0-#ee0');
         // initial values don't matter because they will be overwritten in this.update()
         // it is important that the L is captial (absolute rather than relative)
         // and important that y1 == y2
-        var grad = this.paper.gradient('L(0, 0, 0, 0)#000-000');
-        this.gradients.push(grad);
-        line.attr({ stroke: grad });
+        // var grad = this.paper.gradient('L(0, 0, 0, 0)#000-000');
+        // this.gradients.push(grad);
+        // line.attr({ stroke: grad });
       }
     },
 
@@ -139,16 +138,17 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
           this.lerpLines[i].remove();
           this.lerpLines[i] = null;
 
-          this.gradients[i].remove();
-          this.gradients[i] = null;
+          // this.gradients[i].remove();
+          // this.gradients[i] = null;
         }
       }
       this.lerpLines = [];
-      this.gradients = [];
+      // this.gradients = [];
     },
 
     update: function () {
       var model = this.parent.model;
+      var t = model.t;
       var knotView = this.parent.knotView;
 
       var uBarBeginOffset = model.uBarBegin() * knotView.knotLineLength;
@@ -168,11 +168,11 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
 
       // update the vertical line
       // var t = (performance.now() / 4000) % 1;
-      var t = this.parent.deboorController.t;
-      if (t > 1) {
-        // allow t = 1
-        t = t % 1;
-      }
+      // if (t > 1) {
+      //   // allow t = 1
+      //   t = t % 1;
+      // }
+      
       this.vLineStyle.x1 = knotView.x0 + uBarBeginOffset + t * model.uBarRange() * knotView.knotLineLength;
       this.vLineStyle.x2 = knotView.x0 + uBarBeginOffset + t * model.uBarRange() * knotView.knotLineLength;
       this.vLine.attr(this.vLineStyle);
@@ -183,20 +183,9 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
 
       // update the lerpLines and gradients
       // which set of lerp lines to draw depends on I, which depends on t.
-      var n = model.points.length;
-      // transform t to u^bar
-      var uBar = model.uBarBegin(); // lowest possible value is the initial value.
-      try {
-        uBar = BSpline.lerp(t, 0, 1, model.knots[model.k - 2], model.knots[n - 1]);
-      } catch (err) {
-        console.log(err.message);
-      }
-      var I = model.findIndex(uBar);
-      // console.log(I);
       var lineCounter = 0;
-      var d10Color = null;
-      var d11Color = null;
-      var swap = false;
+      var n = model.points.length;
+      var I = model.I;
       for (var j = 1; j <= (model.k - 1); j++) {
         for (var i = (I - (model.k - 2)); i <= I - j + 1; i++) {
           this.lerpLines[lineCounter].attr({
@@ -205,36 +194,10 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
           });
 
           // update gradient
-          this.gradients[lineCounter].attr({
-            x1: knotView.x0 + model.knots[i + j - 1] * knotView.knotLineLength,
-            x2: knotView.x0 + model.knots[i + model.k - 1] * knotView.knotLineLength,
-          });
-          if (j == 1) {
-            var stops = this.gradients[lineCounter].stops();
-            stops[0].attr({
-              stopColor: model.colors[i],
-            });
-            stops[1].attr({
-              stopColor: model.colors[i + 1],
-            });
-            var p = BSpline.lerp(uBar, model.knots[i + j - 1], model.knots[i + model.k -1], 0, 1);
-            if (!swap) {
-              
-              d10Color = lerpColor(model.colors[i], model.colors[i + 1], p);
-              swap = true;
-            } else {
-              d11Color = lerpColor(model.colors[i], model.colors[i + 1], p);
-              swap = false;
-            }
-          } else if (j == 2) {
-            var stops = this.gradients[lineCounter].stops();
-            stops[0].attr({
-              stopColor: d10Color,
-            });
-            stops[1].attr({
-              stopColor: d11Color,
-            });
-          }
+          // this.gradients[lineCounter].attr({
+          //   x1: knotView.x0 + model.knots[i + j - 1] * knotView.knotLineLength,
+          //   x2: knotView.x0 + model.knots[i + model.k - 1] * knotView.knotLineLength,
+          // });
 
           lineCounter++;
         }

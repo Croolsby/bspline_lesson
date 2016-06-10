@@ -77,8 +77,9 @@ define('bspline-controller', [], function () {
     } else {
       if (!bspline.controller.hovering) {
         // drag the selected point
-        bspline.model.points[bspline.controller.selectedPointIndex].x = ev.clientX;
-        bspline.model.points[bspline.controller.selectedPointIndex].y = ev.clientY;
+        // bspline.model.points[bspline.controller.selectedPointIndex].x = ev.clientX;
+        // bspline.model.points[bspline.controller.selectedPointIndex].y = ev.clientY;
+        bspline.model.setPoint(bspline.controller.selectedPointIndex, ev.clientX, ev.clientY);
         bspline.model.dirty = true;
       }
     }

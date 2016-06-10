@@ -52,7 +52,7 @@ define('bspline-view', ['knot-view'], function (KnotView) {
       this.destructSVGElements();
 
       var model = this.parent.model;
-
+      
       // draw a line segment between each control point
       this.controlLines = this.paper.polyline(model.pointsToArray());
       this.controlLines.attr({
@@ -68,13 +68,13 @@ define('bspline-view', ['knot-view'], function (KnotView) {
       for (var i = 0; i < this.points.length; i++) {
         this.points[i] = this.paper.circle(model.points[i].x, model.points[i].y, 14);
         this.points[i].attr({
-          fill: model.colors[i],
+          fill: '#eee',
           fillOpacity: 0.5,
         });
       }
 
       // initialize snap svg elements
-      this.path = this.paper.polyline(model.pathToArray());
+      this.path = this.paper.polyline(model.pathAsArray);
       this.path.attr({
         stroke: '#eee',
         strokeWidth: 6,
@@ -108,12 +108,13 @@ define('bspline-view', ['knot-view'], function (KnotView) {
 
         // update path
         this.path.attr({
-          points: model.pathToArray(),
+          points: model.pathAsArray,
         });
       }
 
       // var v = model.calc(performance.now() / 4000);
-      var v = model.calc(this.parent.deboorController.t);
+      // var v = model.calc(this.parent.deboorController.t);
+      var v = model.calcPoint;
       this.dot.attr({
         cx: v.x,
         cy: v.y,

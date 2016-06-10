@@ -81,7 +81,7 @@ define('deboor-controller', ['deboor-view'], function (View) {
       if (p > 1) {
         p = 1;
       }
-      thisController.t = p;
+      bspline.model.calc(p);
     }
   };
 
@@ -91,7 +91,6 @@ define('deboor-controller', ['deboor-view'], function (View) {
     var dy = y - controlDotStyle.cy;
     var dsqr = dx * dx + dy * dy;
     if (dsqr <= controlDotStyle.r * controlDotStyle.r) {
-      console.log('hit');
       return true;
     } else {
       return false;
