@@ -9,8 +9,15 @@ define('bspline-model', ['vector'], function (Vector) {
     this.parent = parent;
 
     // initialize state variables
-    this.position = new Vector(0, 0, 0);
-    this.points = []; // array of Vector
+    // this.position = new Vector(0, 0, 0);
+    this.points = [];
+    // this.d is the deboor point cascade (that triangular matrix thing).
+    // im saving the generations once they are calculated so that the views and controllers can reference them without calling calc() again.
+    // d[generation][point of that generation]
+    this.d = [];
+    this.t = 0;
+    // calcPoint contains the last valid (valid as in no error) return of calc().
+    this.calcPoint = new Vector(0, 0);
     this.colors = [];
     this.knots = [];
     this.k = 3; // degree
@@ -27,9 +34,11 @@ define('bspline-model', ['vector'], function (Vector) {
       y = y || this.points[this.points.length - 1] || this.position.y;
       this.points.push(new Vector(x, y));
       this.colors.push(randomHex());
-      this.makeColorsAlternate();
       this.makeKnotsLinSpaced();
       this.dirty = true;
+
+      // call calc to recompute this.d and this.calcPoint. 
+      this.calc(this.t);
     },
 
     // returns a Vector object
@@ -44,7 +53,8 @@ define('bspline-model', ['vector'], function (Vector) {
       // ensure n >= k
       if (!(this.points.length >= this.k)) {
         // Debug.LogError("Ensure n >= k");
-        return this.position;
+        console.log('Not enough points.');
+        return new Vector(0, 0);
       }
 
       var n = this.points.length;
@@ -55,38 +65,28 @@ define('bspline-model', ['vector'], function (Vector) {
         uBar = BSpline.lerp(t, 0, 1, this.knots[this.k - 2], this.knots[n - 1]);
       } catch (err) {
         console.log(err.message);
-        return this.position;
+        return new Vector(0, 0);
       }
 
       // find index I such that u_I <= u^bar <= u_(I + 1)
       var I = this.findIndex(uBar);
 
-
-      // d[generation][point of that generation] : Vector[][]
-      var d = BSpline.create2DArray(this.k, n - 1); // shouldn't this be k -1 not k? and n - 1?
+      // d[generation][point of that generation]
+      this.d = BSpline.create2DArray(this.k, n);
 
       // init first generation
       for (var i = 0; i < n; i++) {
-        d[0][i] = this.points[i]; // points[i] type is Transform
-
-        // if (I != 1) {
-        //   console.log('d[' + 0 + '][' + i + ']: ' + d[0][i].x + ', ' + d[0][i].y);
-        // }
+        this.d[0][i] = this.points[i]; // points[i] type is Transform
       }
 
-      //print("I: " + I);
-      //print("uBar: " + uBar);
-      // console.log('I: ' + I);
       for (var j = 1; j <= (this.k - 1); j++) {
         for (var i = (I - (this.k - 2)); i <= I - j + 1; i++) {
-
-          // console.log('j, i: ' + j + ',' + i);
           // the i'th point of generation j
           var x = BSpline.lerp(uBar, this.knots[i + j - 1], this.knots[i + this.k - 1],
-            d[j - 1][i].x, d[j - 1][i + 1].x);
+            this.d[j - 1][i].x, this.d[j - 1][i + 1].x);
           var y = BSpline.lerp(uBar, this.knots[i + j - 1], this.knots[i + this.k - 1],
-            d[j - 1][i].y, d[j - 1][i + 1].y);
-          d[j][i] = new Vector(x, y);
+            this.d[j - 1][i].y, this.d[j - 1][i + 1].y);
+          this.d[j][i] = new Vector(x, y);
 
           // if (I != 1) {
           //   if (this.knots[i + j - 1] == this.knots[i + this.k - 1]) {
@@ -101,7 +101,10 @@ define('bspline-model', ['vector'], function (Vector) {
         }
       }
 
-      return d[this.k - 1][I - (this.k - 2)];
+      // save the return value and the corresponding t.
+      this.t = t;
+      this.calcPoint = this.d[this.k - 1][I - (this.k - 2)] 
+      return this.calcPoint;
     },
 
     findIndex: function (u) {
@@ -110,13 +113,8 @@ define('bspline-model', ['vector'], function (Vector) {
         i++;
       }
       i--;
-      // at this point in execution, u > knots[i] 
-
-      // if multiple knots are overlapping, accept the first of these overlapping knots.
-      // while (i != 0 && (this.knots[i - 1] == this.knots[i])) {
-      //   // true if the previous knot is overlapping this knot.
-      //   i--;
-      // }
+      
+      // we know the bounds on Index
       if (i < this.k - 2) {
         i = this.k - 2;
       }
@@ -125,13 +123,6 @@ define('bspline-model', ['vector'], function (Vector) {
       }
 
       return i;
-
-      // The following is so that u is in [u_I, u_I+1)
-      // if (u == this.knots[this.k - 2]) {
-      //   return i;
-      // } else {
-      //   return i - 1;
-      // }
     },
 
     makeKnotsLinSpaced: function () {
@@ -140,16 +131,6 @@ define('bspline-model', ['vector'], function (Vector) {
       this.knots = new Array(nKnots);
       for (var i = 0; i < nKnots; i++) {
         this.knots[i] = (1.0 * i / (n + this.k - 3));
-      }
-    },
-
-    makeColorsAlternate: function () {
-      for (var i = 0; i < this.colors.length; i++) {
-        if (i % 2 == 0) {
-          this.colors[i] = '#ff0000';
-        } else {
-          this.colors[i] = '#0000ff';
-        }
       }
     },
 
