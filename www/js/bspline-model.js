@@ -37,17 +37,17 @@ define('bspline-model', ['vector'], function (Vector) {
       this.makeKnotsLinSpaced();
       this.dirty = true;
       // console.log('appendPoint');
-      // call calc to recompute this.d and this.calcPoint. 
-      this.calc(this.t);
+      // call calc to recompute this.d and this.calcPoint.
       this.pathAsArray = this.pathToArray();
+      this.calc(0);
     },
 
     setPoint: function (i, x, y) {
       this.points[i].x = x;
       this.points[i].y = y;
-      this.calc(this.t);
       // console.log('setPoint called');
       this.pathAsArray = this.pathToArray();
+      this.calc(this.t); // calc should be called after pathAsArray
     },
 
     // returns a Vector object
@@ -87,7 +87,7 @@ define('bspline-model', ['vector'], function (Vector) {
       for (var i = 0; i < n; i++) {
         this.d[0][i] = this.points[i]; // points[i] type is Transform
       }
-
+      
       for (var j = 1; j <= (this.k - 1); j++) {
         for (var i = (I - (this.k - 2)); i <= I - j + 1; i++) {
           // the i'th point of generation j
@@ -167,9 +167,8 @@ define('bspline-model', ['vector'], function (Vector) {
       this.knots[index] = value;
 
       this.dirty = true;
-      this.calc(this.t);
       this.pathAsArray = this.pathToArray();
-      // console.log(this.knots);
+      this.calc(this.t);
     },
 
     // returns the path as a flattened/inline array of points.
