@@ -24,6 +24,7 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
     this.vLine = null;
     this.controlDot = null;
     this.lerpLines = [];
+    this.dPointLabels = [];
     // this.gradients = []; // one gradient for each lerp line.
 
     this.constructSVGElements();
@@ -84,7 +85,7 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       this.controlDot = this.paper.circle(0, 0, 0);
       this.controlDot.attr(this.controlDotStyle);
 
-      // create the lerpLines and gradients
+      // create the lerpLines and dPointLabels
       var model = this.parent.model;
       var kmin1 = model.k - 1;
       var nLerpLines = kmin1 * (kmin1 + 1) / 2; // for example, if k = 4, then there are 3 + 2 + 1 lerp lines.
@@ -100,6 +101,19 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
           strokeLinecap: 'round',
         });
         this.lerpLines.push(line);
+
+        // dPointLabels:
+        // 3 labels per line
+        var labelStyle = {fill: 'white'};
+        var label = this.paper.text(100, 90, 'nullLabel');
+        label.attr(labelStyle);
+        this.dPointLabels.push(label);
+        label = this.paper.text(100, 90, 'nullLabel');
+        label.attr(labelStyle);
+        this.dPointLabels.push(label);
+        label = this.paper.text(100, 90, 'nullLabel');
+        label.attr(labelStyle);
+        this.dPointLabels.push(label);
 
         // gradients:
         // initial values don't matter because they will be overwritten in this.update()
@@ -144,6 +158,15 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       }
       this.lerpLines = [];
       // this.gradients = [];
+
+      // remove dPointLabels
+      for (var i = 0; i < this.dPointLabels.length; i++) {
+        if (this.dPointLabels[i] != null) {
+          this.dPointLabels[i].remove();
+          this.dPointLabels[i] = null;
+        }
+      }
+      this.dPointLabels = [];
     },
 
     update: function () {
@@ -184,14 +207,36 @@ define('deboor-view', ['bspline-model'], function (BSpline) {
       // update the lerpLines and gradients
       // which set of lerp lines to draw depends on I, which depends on t.
       var lineCounter = 0;
+      var dCounter = 0;
       var n = model.points.length;
       var I = model.I;
       for (var j = 1; j <= (model.k - 1); j++) {
         for (var i = (I - (model.k - 2)); i <= I - j + 1; i++) {
-          this.lerpLines[lineCounter].attr({
+          var lineStyle = {
             x1: knotView.x0 + model.knots[i + j - 1] * knotView.knotLineLength,
             x2: knotView.x0 + model.knots[i + model.k - 1] * knotView.knotLineLength,
+          };
+          this.lerpLines[lineCounter].attr(lineStyle);
+
+          var yOfLine = Number(this.lerpLines[lineCounter].node.attributes[2].value); 
+          this.dPointLabels[dCounter].attr({
+            text: 'd' + (j - 1) + '' + i,
+            x: lineStyle.x1 - 30,
+            y: yOfLine + 5,
           });
+          dCounter++;
+          this.dPointLabels[dCounter].attr({
+            text: 'd' + (j - 1) + '' + (i + 1),
+            x: lineStyle.x2 + 5,
+            y: yOfLine + 5,
+          });
+          dCounter++;
+          this.dPointLabels[dCounter].attr({
+            text: 'd' + j + '' + i,
+            x: this.vLineStyle.x1,
+            y: yOfLine + 15,
+          });
+          dCounter++;
 
           // update gradient
           // this.gradients[lineCounter].attr({

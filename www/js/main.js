@@ -61,6 +61,8 @@ require(['bspline'], function (BSpline) {
     fill: "white",
   });
 
+  console.log(fpsText);
+
   var wipText = s.text(300, 15, "Work In Progress");
   wipText.attr({
     fill: 'white',

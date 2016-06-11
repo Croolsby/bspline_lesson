@@ -83,7 +83,7 @@ define('bspline-view', ['knot-view'], function (KnotView) {
         fillOpacity: 0,
       });
 
-      this.dot = this.paper.circle(0, 0, 10);
+      this.dot = this.paper.circle(0, 0, 8);
       this.dot.attr({
         fill: '#ee0000',
         fillOpacity: 0.5,

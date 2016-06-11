@@ -16,6 +16,7 @@ define('scaffold-view', [], function () {
     // declare svg elements:
     this.dPoints = [];
     this.dLines = [];
+    this.dPointLabels = [];
 
     this.constructSVGElements();
   }
@@ -24,15 +25,20 @@ define('scaffold-view', [], function () {
     constructSVGElements: function () {
       this.destructSVGElements(); // ensure resources are freed
 
-      // create dPoints.
+      // create dPoints and dLabels.
       // dPoints need to be recreated if k changes.
       var kmin1 = this.parent.model.k - 1;
-      var nDPoints = kmin1 * (kmin1 + 1) / 2 - 1; // minues 1 here because we aren't going to draw the final point.
+      var nDPoints = kmin1 * (kmin1 + 1) / 2;
       for (var i = 0; i < nDPoints; i++) {
         this.dPoints.push(this.paper.circle(0, 0, 8));
         this.dPoints[i].attr({
           fill: '#eee',
           fillOpacity: 0.5
+        });
+
+        this.dPointLabels.push(this.paper.text(100, 100, 'dnullnull'));
+        this.dPointLabels[i].attr({
+          fill: 'white',
         });
       }
 
@@ -65,19 +71,34 @@ define('scaffold-view', [], function () {
         }
       }
       this.dLines = [];
+
+      for (var i = 0; i < this.dPointLabels.length; i++) {
+        if (this.dPointLabels[i] != null) {
+          this.dPointLabels[i].remove();
+          this.dPointLabels[i] = null;
+        }
+      }
+      this.dPointLabels = [];
     },
 
     update: function () {
       var model = this.parent.model;
 
-      // update dPoints
+      // update dPoints and dLabels
       var dCounter = 0;
-      for (var j = 1; j <= model.k - 2; j++) { // j is one less than the normal calc alg
+      for (var j = 1; j <= model.k - 1; j++) {
         for (var i = (model.I - (model.k - 2)); i <= model.I - j + 1; i++) {
           this.dPoints[dCounter].attr({
             cx: model.d[j][i].x,
             cy: model.d[j][i].y,
           });
+
+          this.dPointLabels[dCounter].attr({
+            text: 'd' + j + '' + i,
+            x: model.d[j][i].x,
+            y: model.d[j][i].y - 10,
+          });
+
           dCounter++;
         }
       }
