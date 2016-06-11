@@ -79,13 +79,14 @@ define('bspline-view', ['knot-view'], function (KnotView) {
         stroke: '#eee',
         strokeWidth: 6,
         strokeLinecap: 'round',
+        strokeOpacity: 0.5,
         fillOpacity: 0,
       });
 
       this.dot = this.paper.circle(0, 0, 10);
       this.dot.attr({
         fill: '#ee0000',
-        fillOpacity: 1,
+        fillOpacity: 0.5,
       });
     },
 

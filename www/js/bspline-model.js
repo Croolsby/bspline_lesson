@@ -21,7 +21,7 @@ define('bspline-model', ['vector'], function (Vector) {
     this.calcPoint = new Vector(0, 0);
     this.pathAsArray = [];
     this.knots = [];
-    this.k = 3; // degree
+    this.k = 4; // degree
 
     // dirty flag used by bspline-view.js to know when to update the svg representation of the path. 
     this.dirty = false;
